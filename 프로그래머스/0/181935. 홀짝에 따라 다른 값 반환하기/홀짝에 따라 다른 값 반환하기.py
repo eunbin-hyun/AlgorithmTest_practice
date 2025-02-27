@@ -1,11 +1,7 @@
 def solution(n):
     answer = 0
     if n % 2 == 1:
-        for i in range(n+1):
-            if i % 2 == 1:
-                answer += i
+        answer = sum(range(1, n+1, 2))
     else: 
-        for j in range(n+1):
-            if j % 2 == 0:
-                answer += (j**2)
+        answer = sum(i*i for i in range(2, n+1, 2))
     return answer
