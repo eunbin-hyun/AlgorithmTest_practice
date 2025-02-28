@@ -1,5 +1,4 @@
 def solution(money):
     answer = []
-    
-    answer = divmod(money,5500)
+    answer = [money//5500, money%5500]
     return answer
