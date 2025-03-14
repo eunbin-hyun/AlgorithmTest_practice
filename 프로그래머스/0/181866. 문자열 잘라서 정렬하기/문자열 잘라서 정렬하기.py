@@ -1,2 +1,2 @@
 def solution(myString):
-    return sorted(filter(None, myString.split('x')))
+    return sorted(ch for ch in myString.split('x') if ch)
