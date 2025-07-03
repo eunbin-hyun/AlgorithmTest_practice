@@ -1,6 +1,6 @@
 def solution(N, stages):
     answer = []
-    for i in range(N+1):
+    for i in range(1, N+1):
         answer.append([i, 0])
     
     stages.sort(reverse =True)
@@ -16,13 +16,9 @@ def solution(N, stages):
             continue
 
         i += stages.count(cur_stage)
-        answer[cur_stage] = [cur_stage, cnt/i]
+        answer[cur_stage-1][1] = cnt/i
 
-    answer.sort(key = lambda n: n[0])
-    answer.remove([0,0])
-    answer.sort(key = lambda n: n[1], reverse=True)
+    answer.sort(key = lambda n: (-n[1], n[0]))
     
-    l = []
-    for i in range(len(answer)):
-        l.append(answer[i][0])
+    l = [s for s, _ in answer]
     return l
