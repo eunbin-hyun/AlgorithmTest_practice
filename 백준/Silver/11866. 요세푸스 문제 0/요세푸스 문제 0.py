@@ -20,7 +20,5 @@ while n > len(result):
             result.append(q)
 
 print("<", end="")
-for i in range(n-1):
-    print(result[i], end=", ")
-print(result[-1], end="")
+print(*result, sep=", ", end="")
 print(">")
