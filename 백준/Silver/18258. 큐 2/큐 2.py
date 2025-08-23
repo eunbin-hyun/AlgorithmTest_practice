@@ -2,38 +2,28 @@ from collections import deque
 import sys
 input = sys.stdin.readline
 
-q = deque()
 n = int(input())
+queue = deque()
 
-for i in range(n):
-    k = list(input().split())
-
+for _ in range(n):
+    k = input().split()
     if len(k) == 2:
-        q.append(k[1])
-    elif k[0] == 'pop':
-        if not q:
+        queue.append(k[1])
+    elif not queue:
+        if k[0] == 'pop' or k[0] == 'front' or k[0] == 'back':
             print(-1)
-        else:
-            j = q.popleft()
-            print(j)
-    elif k[0] =='size':
-        if q:
-            print(len(q))
-        else:
+        elif k[0] == 'size':
             print(0)
-    elif k[0] == 'empty':
-        if q:
-            print(0)
-        else:
+        elif k[0] == 'empty':
             print(1)
+    elif k[0] == 'pop':
+        print(queue.popleft())
+    elif k[0] == 'size':
+        print(len(queue))
+    elif k[0] == 'empty':
+        print(0)
     elif k[0] == 'front':
-        if q:
-            print(q[0])
-        else:
-            print(-1)
+        print(queue[0])
     elif k[0] == 'back':
-        if q:
-            print(q[-1])
-        else:
-            print(-1)
+        print(queue[-1])
 
