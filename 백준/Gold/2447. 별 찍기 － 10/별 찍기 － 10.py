@@ -1,42 +1,31 @@
-
-
 def star(n):
-    # ----- 기본 패턴 -----------
-    if n == 3:  # n이 3일 때, 가장 작은 3*3 별 모양을 리턴
-        x = [['*','*','*'],
-             ['*',' ','*'], 
-             ['*', '*', '*']]
-        return x
-    
-    # --- 재귀 호출 ----
-    # 더 작은 패턴(크기 n//3)을 먼저 만든다
-    x = star(n//3)
+    # --- Base case ---
+    if n == 1:
+        return ['*']   # n=1이면 그냥 '*' 하나짜리 문자열 리스트 리턴
 
-    # 리스트의 3배로 세로로 복제 -> 윗/중간/아래 부분 틀 잡기
-    x = x*3
+    # --- Recursive step ---
+    arr = star(n//3)   # 더 작은 패턴 생성 (1/3 크기)
+    result = []        # 이번 단계에서 만들어질 n x n 패턴 담을 리스트
 
-    # --- 윗부분 (0 ~ n//3-1) ---
-    # 작은 패턴을 가로로 3배 복사
-    for i in range(n//3):
-        x[i] = x[i] * 3
-    
-    # --- 가운데 부분 (n//3 ~ 2n//3-1)
-    # 좌측 패턴 + 공백(n//3) + 우측 패턴
-    for i in range(n//3, (n//3)*2):
-        x[i] = x[i] + [' ']*(n//3) + x[i]
-    
-    # --- 아랫부분 (2n//3 ~ n-1) ---
-    # 작은 패턴을 가로로 3배 복사
-    for i in range((n//3)*2, n):
-        x[i] = x[i] * 3
+    # --- 윗부분 ---
+    for i in arr:
+        result.append(i*3)
+        # 작은 패턴 문자열 i를 가로로 3번 반복 → 윗줄 완성
 
-    # 완성된 n*n 패턴 리턴
-    return x
+    # --- 가운데 부분 ---wnf
+    for i in arr:
+        result.append(i + ' '*(n//3) + i)
+        # 왼쪽: 작은 패턴 i
+        # 가운데: 공백 n//3 개
+        # 오른쪽: 작은 패턴 i
+        # → 가운데가 뚫린 줄 생성
 
-# 입력값 받기
-n = int(input())
-resultarr = star(n)  # n 크기의 패턴 생성
+    # --- 아랫부분 ---
+    for i in arr:
+        result.append(i*3)
+        # 윗부분과 동일: 작은 패턴을 가로 3번 반복
 
-# 출력 (리스트를 문자열로 이어 붙임)
-for i in range(n):
-    print(*resultarr[i], sep='')
+    return result   # 완성된 n x n 패턴 리턴
+
+n = int(input())           # 입력받기
+print('\n'.join(star(n)))  # 리스트를 줄바꿈으로 이어서 출력
