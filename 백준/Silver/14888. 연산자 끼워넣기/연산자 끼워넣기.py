@@ -2,40 +2,30 @@ n = int(input())
 array = list(map(int, input().split()))
 k = list(map(int, input().split()))
 
-stack = []
-max_value = -1000000001
-min_value = 1000000001
+maxval = -1e10
+minval = 1e10
 
-def back():
-    if len(stack) == n-1:
-        result = array[0]
-        for num in range(n-1):
-            if stack[num] == 0:
-                result += array[num+1]
-            elif stack[num] == 1:
-                result -= array[num+1]
-            elif stack[num] == 2:
-                result *= array[num+1]
-            elif stack[num] == 3:
-                result = int(result/array[num+1])
+def dfs(num, i, add, sub, mul, div):
+    global maxval, minval
 
-        global max_value
-        global min_value
-        if result >= max_value:
-            max_value = result
-        if result <= min_value:
-            min_value = result
+    # 모든 숫자를 다 썼다면 i==n -> 리프노드 도달
+    if i == n:
+        maxval = max(maxval, num)
+        minval = min(minval, num)
         return
-
-    for i in range(4):
-        if k[i] >0 :
-            k[i] -= 1
-            stack.append(i)
-            back()
-            stack.pop()
-            k[i] += 1
-
-back()
-print(max_value)
-print(min_value)
+    
+    # 아직 사용할 숫자가 남았다면, 남은 연산자 하나씩 사용해 재귀호출
+    else:
+        if add:
+            dfs(num+array[i], i+1, add-1, sub, mul, div)
+        if sub:
+            dfs(num-array[i], i+1, add, sub-1, mul, div)
+        if mul:
+            dfs(num*array[i], i+1, add, sub, mul-1, div)
+        if div:
+            dfs(int(num/array[i]), i+1, add, sub, mul, div-1)
+        
+dfs(array[0], 1, k[0], k[1], k[2], k[3])
+print(maxval)
+print(minval)
 
