@@ -1,24 +1,16 @@
 from collections import deque
-import sys
-input = sys.stdin.readline
 n, m = map(int, input().split())
 arr = [list(map(int, input().split())) for _ in range(n)]
-cloud  = deque([])
+# 첫 비바라기 (N, 1), (N, 2), (N-1, 1), (N-1, 2)에 비구름
+cloud  = deque([(n - 1, 0), (n - 1, 1), (n - 2, 0), (n - 2, 1)])
 temp = deque([])
 
 # 0번 / 1~8번 이동 좌표 (대각선 방향 2,4,6,8)
 dx = [0, 0, -1, -1, -1, 0, 1, 1, 1]
 dy = [0, -1, -1, 0, 1, 1, 1, 0, -1]
 
-for I in range(m):
+for _ in range(m):
     d, s = map(int, input().split())
-    # 첫 시작 비바라기
-    if I == 0:
-        # (N, 1), (N, 2), (N-1, 1), (N-1, 2)에 비구름
-        cloud.append((n - 1, 0))
-        cloud.append((n - 1, 1))
-        cloud.append((n - 2, 0))
-        cloud.append((n - 2, 1))
 
     # 1) 구름 d,s 만큼 이동
     for _ in range(len(cloud)):
@@ -42,9 +34,10 @@ for I in range(m):
 
 
     #5) 물 2 이상인 모든 칸 구름
+    prev = set(cloud) # not in 시간 초과나니 set로 바꿔서!
     for i in range(n):
         for j in range(n):
-            if arr[i][j] >= 2 and (i,j) not in cloud:
+            if arr[i][j] >= 2 and (i,j) not in prev:
                 arr[i][j] -= 2
                 temp.append((i,j))
 
