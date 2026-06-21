@@ -1,52 +1,53 @@
 #include <iostream>
 #include <cstring>
-#include <algorithm>
 
 using namespace std;
 
 int n;
-int map[21][21];
-int visited[21][21];
-int desert[101];
-
-int sy, sx;
+int grid[21][21];
 int result;
 
-// 방향: 오른쪽위, 오른쪽아래, 왼쪽아래, 왼쪽위
-int dy[4] = { -1,1,1,-1 };
-int dx[4] = { 1,1,-1,-1 };
+// 방향: 오른아래, 왼아래, 왼위, 오른위
+int dy[4] = { 1,1,-1,-1 };
+int dx[4] = { 1,-1, -1, 1 };
 
-void dfs(int cy, int cx, int cd, int cnt) {
-	// 다음위치 계산 (직진, 회전)
-	for (int turn = 0; turn <= 1; turn++) {
-		int nd = cd + turn;
 
-		// 방향은 0- > 1 -> 2 -> 3 까지만 허용
-		if (nd >= 4)continue; // 재귀이기에 return 사용하면 하는중간에 끊킴
+void simulation(int cy, int cx, int len1, int len2) {
+	int visited[101] = { 0 };
+	bool is_valid = true;
 
-		int ny = cy + dy[nd];
-		int nx = cx + dx[nd];
+	// 각 방향(0,1,2,3)마다 이동해야 하는 횟수를 배열로 매핑
+	int lens[4] = { len1, len2, len1, len2 };
 
-		// 시작점으로 돌아오는 경우
-		if (sy == ny && sx == nx) {
-			if (cnt >= 4 && nd == 3) {
-				result = max(cnt, result);
+	for (int d = 0; d < 4; d++) {
+		for (int step = 1; step <= lens[d]; step++) {
+			// 정해진 방향으로 한칸 전진
+			cy += dy[d];
+			cx += dx[d];
+
+			// 1. 격자 범위 체크 
+			if (cy < 0 || cy >= n || cx < 0 || cx >= n) {
+				is_valid = false;
+				break;
 			}
-			continue; // 아래부분 무시
+
+			// 2. 디저트 중복 체크
+			int dessert_type = grid[cy][cx];
+			if (visited[dessert_type]) {
+				is_valid = false;
+				break;
+			}
+
+			// 방문 표시
+			visited[dessert_type] = 1;
 		}
-
-		// 막힌경우 continue로 그 경우에 대해서 무시하고 계속 진행 !!
-		if (ny < 0 || nx < 0 || ny >= n || nx >= n) continue;
-		if (visited[ny][nx]) continue;
-		if (desert[map[ny][nx]]) continue;
-
-		visited[ny][nx] = 1;
-		desert[map[ny][nx]] = 1;
-
-		dfs(ny, nx, nd, cnt + 1);
-
-		visited[ny][nx] = 0;
-		desert[map[ny][nx]] = 0;
+		if (!is_valid)break;
+	}
+	if (is_valid) {
+		int total_desserts = (len1 + len2) * 2;
+		if (total_desserts > result) {
+			result = total_desserts;
+		}
 	}
 }
 
@@ -54,30 +55,26 @@ int main() {
 	int T;
 	cin >> T;
 	for (int tc = 1; tc <= T; tc++) {
-		// 초기화
-		memset(visited,0, sizeof(visited));
-		memset(desert, 0, sizeof(desert));
-		result = 0;
-		// 입력
+		result = -1;
 		cin >> n;
-		for (int y = 0; y < n; y++)
-			for (int x = 0; x < n; x++)
-				cin >> map[y][x];
-
-		// 함수(시작점 전달)
 		for (int y = 0; y < n; y++) {
 			for (int x = 0; x < n; x++) {
-				for (int d = 0; d < 4; d++) { // 방향 시작점
-					sy = y, sx = x;
-					visited[y][x] = 1;
-					desert[map[y][x]] = 1;
-					dfs(y, x, d, 1); // cnt =1 이다 (시작지점 세기)!!
-					visited[y][x] = 0;
-					desert[map[y][x]] = 0;
+				cin >> grid[y][x];
+			}
+		}
+
+		// 시작 좌표 (y,x) 설정
+		for (int y = 0; y < n - 2; y++) {
+			for (int x = 1; x < n - 1; x++) {
+
+				// 우하단 방향길이 (len1), 좌하단 방향길이 (len2)
+				for (int len1 = 1; len1 < n; len1++) {
+					for (int len2 = 1; len2 < n; len2++) {
+						simulation(y, x, len1, len2);
+					}
 				}
 			}
 		}
-		if (result == 0) cout << '#' << tc << ' ' << -1 << '\n';
-		else cout << '#' << tc << ' ' << result << '\n';
+		cout << '#' << tc << ' ' << result << '\n';
 	}
 }
