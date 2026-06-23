@@ -1,0 +1,15 @@
+#include <iostream>
+
+using namespace std;
+
+int main() {
+	int T;
+	cin >> T;
+	for (int tc = 1; tc <= T; tc++) {
+		int n, m;
+		cin >> n >> m;
+		int mask = (1 << n) - 1;
+		if ((mask & m) == mask) cout << '#' << tc << ' ' << "ON" << '\n';
+		else cout << '#' << tc << ' ' << "OFF" << '\n';
+	}
+}
