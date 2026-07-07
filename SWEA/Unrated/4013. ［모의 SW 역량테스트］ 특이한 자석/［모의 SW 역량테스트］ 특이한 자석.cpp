@@ -59,19 +59,17 @@ void rotate() {
 			memcpy(temp, wheel, sizeof(wheel));
 			// 시계방향회전
 			if (visited[i] == 1) {
-				int tmp = wheel[i][8];
+				temp[i][1] = wheel[i][8];
 				for (int j = 1; j < 8; j++) {
 					temp[i][j + 1] = wheel[i][j];
 				}
-				temp[i][1] = tmp;
 				memcpy(wheel, temp, sizeof(temp));
 			}
 			else {	// 반시계 회전
-				int tmp = wheel[i][1];
+				temp[i][8] = wheel[i][1];
 				for (int j = 8; j > 1; j--) {
 					temp[i][j - 1] = wheel[i][j];
 				}
-				temp[i][8] = tmp;
 				memcpy(wheel, temp, sizeof(temp));
 			}
 		}
@@ -83,14 +81,9 @@ void rotate() {
 int calcul() {
 	int result = 0;
 	for (int i = 1; i <= 4; i++) {
-		int tmp = 0;
 		if (wheel[i][1]==1) {
-			if (i == 1) tmp = 1;
-			else if (i == 2) tmp = 2;
-			else if (i == 3) tmp = 4;
-			else if (i == 4) tmp = 8;
+			result += (1 << (i - 1));
 		}
-		result += tmp;
 	}
 	return result;
 }
