@@ -1,0 +1,132 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+const int MAX_N = 100000;
+const int LOG = 17;
+
+int n;
+long long answer;
+
+vector<int> tree[MAX_N + 1]; // tree[x] = x번 노드의 자식 목록
+int depthArr[MAX_N + 1];  // depthArr[x] = 루트 1번에서 x번 노드까지의 깊이
+
+int parentArr[LOG + 1][MAX_N + 1]; // parentArr[k][node] = node의 2^k번째 조상
+
+// 두 노드 a, b의 최소 공통 조상 LCA를 구하는 함수
+int getLCA(int a, int b) 
+{
+	// 항상 a가 더 깊은 노드가 되도록 만든다
+	if (depthArr[a] < depthArr[b]) swap(a, b);
+
+	// a와 b의 깊이 차이
+	int diff = depthArr[a] - depthArr[b];
+
+	// 깊이 차이만큼 a를 위로 올린다
+	for (int k = LOG; k >= 0; k--) {
+		int jump = 1 << k;
+
+		if (diff >= jump) {
+			a = parentArr[k][a];
+			diff -= jump;
+		}
+	}
+
+	// 깊이를 맞춘뒤 같은 노드라면 LCA다
+	if (a == b) return a;
+
+	// 큰 점프부터 확인한다
+	for (int k = LOG; k >= 0; k--) {
+		// 부모가 다른경우 같이 올려
+		if (parentArr[k][a] != parentArr[k][b]) {
+			a = parentArr[k][a];
+			b = parentArr[k][b];
+		}
+	}
+
+	// 반복이 끝나면 a,b는 서로 다른 노드지만 바로 위 부모는 같은 상태
+	return parentArr[0][a];
+}
+
+// 두 노드 사이의 최단거리 계산
+// 거리(a, b) = depth[a] + depth[b] - 2 * depth[LCA]
+int getDistance(int a, int b) {
+	int lca = getLCA(a, b);
+	return depthArr[a] + depthArr[b] - 2 * depthArr[lca];
+}
+
+
+// bfs 방문 순서대로 실제 이동거리 계산
+void bfs() {
+	queue<int> q;
+	q.push(1);
+
+	// 이전까지 방문한 노드
+	int prevNode = 0;
+
+	while (!q.empty()) {
+		int cur = q.front();
+		q.pop();
+
+		// 첫번째 노드가 아니라면 이전노드에서 현재노드까지의 거리를 더한다
+		if (prevNode != 0) answer += getDistance(prevNode, cur);
+
+		// 현재 노드를 다음 이동의 이전 노드로 저장
+		prevNode = cur;
+
+		// 현재 노드의 모든 자식을 큐에 넣는다
+		for (int i = 0; i < tree[cur].size(); i++) {
+			int childNode = tree[cur][i];
+			q.push(childNode);
+		}
+	}
+}
+
+
+int main() {
+	int T;
+	cin >> T;
+
+	for (int tc = 1; tc <= T; tc++) {
+		cin >> n;
+
+		// 초기화
+		answer = 0;
+		for (int node = 1; node <= n; node++) {
+			tree[node].clear();
+			depthArr[node] = 0;
+
+			for (int k = 0; k <= LOG; k++)
+				parentArr[k][node] = 0;
+		}
+
+		// 각 노드의 부모 입력
+		for (int node = 2; node <= n; node++) {
+			int parent;
+			cin >> parent;
+
+			// 부모의 자식 목록에 현재노드를 추가
+			tree[parent].push_back(node);
+			// 현재 노드의 바로 위 부모를 저장
+			parentArr[0][node] = parent;
+			// 현재의 노드의 깊이는 부모 깊이 +1
+			depthArr[node] = depthArr[parent] + 1;
+		}
+
+		// LCA 빠르게 하기위해 2^k칸 위 조상 저장
+		for (int k = 1; k <= LOG; k++) {
+			for (int node = 1; node <= n; node++) {
+				int middleParent = parentArr[k - 1][node];
+				parentArr[k][node] = parentArr[k - 1][middleParent];
+			}
+		}
+
+		bfs();
+
+		cout << '#' << tc << ' ' << answer << '\n';
+
+	}
+}
